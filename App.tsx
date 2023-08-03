@@ -1,38 +1,49 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React from 'react';
-import {
-  SafeAreaView,
-  StyleSheet, Text,
-  useColorScheme, View,
-} from 'react-native';
+import {StatusBar, StyleSheet,} from 'react-native';
+import {SafeAreaProvider} from "react-native-safe-area-context";
+import {NavigationContainer} from "@react-navigation/native";
+import {createStackNavigator} from "@react-navigation/stack";
+import router from "./src/route";
 
-import {
-  Colors,
-} from 'react-native/Libraries/NewAppScreen';
+
+const Stack = createStackNavigator();
+
+const onBeforeRemove = (e: any) => {
+  console.log('e',e)
+  // 在这里执行路由拦截或认证检查的逻辑
+  // 如果需要阻止屏幕的移除，可以调用e.preventDefault()
+  // 例如，如果用户未登录，则阻止移除特定屏幕，让用户先登录
+};
 
 function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <View>
-        <Text>12312366</Text>
-      </View>
-    </SafeAreaView>
+      <SafeAreaProvider>
+        <StatusBar
+            barStyle={'dark-content'}
+            backgroundColor={'white'}
+        />
+        <NavigationContainer>
+          {/*elevation: 页面的层级*/}
+          <Stack.Navigator initialRouteName={router.default} screenOptions={{cardStyle:{elevation:1}}}>
+            {router.routes.map((route) => (
+                <Stack.Screen
+                    key={route.name}
+                    name={route.name}
+                    component={route.component}
+                    options={{
+                      headerShown: false, // 可以根据需要配置其他导航选项
+                    }}
+                    listeners={{
+                      beforeRemove: onBeforeRemove,
+                    }}
+                />
+            ))}
+          </Stack.Navigator>
+        </NavigationContainer>
+      </SafeAreaProvider>
   );
 }
 
-const styles = StyleSheet.create({
-});
+const styles = StyleSheet.create({});
 
 export default App;
